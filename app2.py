@@ -81,11 +81,13 @@ async def upload(request: Request, file: UploadFile = File(...)):
     # Trong phương thức post upload
     # Tính argmax của biến result
     argmax_result = np.argmax(result)
-
+    confedence = (result[argmax_result])
     # Chuyển kết quả argmax thành int
     argmax_result_int = int(argmax_result)
-    
-    return JSONResponse(status_code=200, content={"result": disease_id[argmax_result_int], 
+    result_json = disease_id[argmax_result_int] if confedence > 0.7 else "Unknown"
+
+    return JSONResponse(status_code=200, content={"result": result_json, 
+                                                  "confidence":str(confedence) ,
                                                   "image_path": image_path,
                                                   "user_id": payload["user_id"],
                                                   "username": payload["username"],
