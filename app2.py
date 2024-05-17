@@ -1,12 +1,12 @@
 import numpy as np
 from PIL import Image
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite
 from fastapi import FastAPI, File, UploadFile, Request, HTTPException
-from fastapi.staticfiles import StaticFiles
-from starlette.requests import Request
-import shutil
 from fastapi.responses import JSONResponse
-import jwt
+# from fastapi.staticfiles import StaticFiles
+# from starlette.requests import Request
+import shutil
+# import jwt
 
 # Thông tin payload của JWT
 payload = {
@@ -17,29 +17,30 @@ payload = {
 
 disease_id = ['BS6', 'EB1', 'FW9', 'GM11', 'HT12', 'LB2', 'MV7', 'PM4', 'SL5', 'TS3',  'VW10', 'YL8']
 
-# # Mã hóa JWT
-# secret_key = "your_secret_key"
+# Mã hóa JWT
+secret_key = "ifjarihq875469kyvestamvlw23d3"
 # token = jwt.encode(payload, secret_key, algorithm="HS256")
 
 app = FastAPI()
 model_path = "models/model.tflite"
 
 # Load model TFLite
-interpreter = tf.lite.Interpreter(model_path=model_path)
+interpreter = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
 # Khai báo thư mục tĩnh để lưu trữ ảnh đã upload
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.post("/upload")
 async def upload(request: Request, file: UploadFile = File(...)):
-    # headers = request.headers
+    headers = request.headers
+    print(headers)
     # try:
     #     # Giải mã JWT
-    #     decoded_payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+    #     decoded_payload = jwt.decode(headers, secret_key, algorithms=["HS256"])
     # except jwt.ExpiredSignatureError:
     #     print("Token đã hết hạn")
     # except jwt.InvalidTokenError:
@@ -53,7 +54,7 @@ async def upload(request: Request, file: UploadFile = File(...)):
     if file.size > 10 * 1024 * 1024:  # 10MB
         raise HTTPException(status_code=413, detail="File size exceeds limit")
 
-    # Lưu file vào thư mục 'static'
+    # # Lưu file vào thư mục 'static'
     with open(f"static/{file.filename}", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
@@ -94,5 +95,4 @@ async def upload(request: Request, file: UploadFile = File(...)):
                                                   "zone_area": payload["zone/area"]})
     
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run('app2:app', host="0.0.0.0", port=1712, reload=True)
+    uvicorn.run('app2:app', host="0.0.0.0", port=1712, reload=True, ssl_keyfile='path/to/keyfile', ssl_certfile='path/to/certfile')
