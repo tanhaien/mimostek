@@ -85,7 +85,7 @@ async def upload(request: Request, file: UploadFile = File(...)):
     confedence = (result[argmax_result])
     # Chuyển kết quả argmax thành int
     argmax_result_int = int(argmax_result)
-    result_json = disease_id[argmax_result_int] if confedence > 0.7 else "Unknown"
+    result_json = disease_id[argmax_result_int] if confedence > 0.6 else "Unknown"
 
     return JSONResponse(status_code=200, content={"result": result_json, 
                                                   "confidence":str(confedence) ,
