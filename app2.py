@@ -1,3 +1,4 @@
+import uvicorn
 import numpy as np
 from PIL import Image
 import tflite_runtime.interpreter as tflite
@@ -95,4 +96,5 @@ async def upload(request: Request, file: UploadFile = File(...)):
                                                   "zone_area": payload["zone/area"]})
     
 if __name__ == "__main__":
-    uvicorn.run('app2:app', host="0.0.0.0", port=1712, reload=True, ssl_keyfile='path/to/keyfile', ssl_certfile='path/to/certfile')
+    uvicorn.run('app2:app', host="0.0.0.0", port=1712, reload=True)
+# , ssl_keyfile='path/to/keyfile', ssl_certfile='path/to/certfile'
